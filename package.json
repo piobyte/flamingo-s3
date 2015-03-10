@@ -1,0 +1,28 @@
+{
+  "name": "flamingo-s3",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "node Makefile.js lint",
+    "test": "node Makefile.js test",
+    "perf": "node Makefile.js perf"
+  },
+  "author": "Christian",
+  "license": "MIT",
+  "keywords": [
+    "flamingo-addon"
+  ],
+  "dependencies": {
+    "aws-sdk": "^2.1.16",
+    "flamingo": "^0.13.1"
+  },
+  "devDependencies": {
+    "eslint": "^0.8.1",
+    "istanbul": "^0.3.2",
+    "mocha": "^1.21.4",
+    "shelljs": "^0.3.0",
+    "shelljs-nodecli": "^0.1.1",
+    "sinon": "^1.10.3"
+  }
+}
