@@ -3,23 +3,12 @@
 
 require('shelljs/make');
 
-/**
- * Generates a function that matches files with a particular extension.
- * @param {string} extension The file extension (i.e. "js")
- * @returns {Function} The function to pass into a filter method.
- * @private
- */
-function fileType(extension) {
-    return function (filename) {
-        return filename.substring(filename.lastIndexOf('.') + 1) === extension;
-    };
-}
+var partialRight = require('lodash/function/partialRight'),
+    endsWith = require('lodash/string/endsWith'),
+    ary = require('lodash/function/ary'),
+    some = require('lodash/collection/some');
 
-function endsWith(ends) {
-    return function (fileName) {
-        return fileName.indexOf(ends) === fileName.length - ends.length;
-    };
-}
+function ends(val) { return ary(partialRight(endsWith, val), 1); }
 
 var path = require('path'),
     nodeCLI = require('shelljs-nodecli');
@@ -31,37 +20,26 @@ var NODE = 'node',
     ISTANBUL = 'istanbul',
     MOCHA = NODE_MODULES + 'mocha/bin/_mocha',
 
-    JS_FILES = find('src/').filter(fileType('js'))
+    JS_FILES = find('src/').filter(ends('.js'))
         .concat('index.js')
-        //.concat('config.js')
         .join(' ');
-    //TEST_FILES = find('test/').filter(fileType('js')).filter(endsWith('.test.js')).join(' ');
+    //TEST_FILES = find('test/').filter(ends('.js')).join(' ');
 
 target.all = function () {
     target.test();
 };
 
 target.lint = function () {
-    var errors = 0,
-        lastReturn;
-
-    echo('Validating Makefile.js');
-    lastReturn = nodeCLI.exec(ESLINT, '-c eslint.json', MAKEFILE);
-    if (lastReturn.code !== 0) { errors++; }
-
-    echo('Validating JavaScript files');
-    lastReturn = nodeCLI.exec(ESLINT, '-c eslint.json', JS_FILES);
-    if (lastReturn.code !== 0) { errors++; }
-
-    echo('Validating JavaScript test files');
-    //lastReturn = nodeCLI.exec(ESLINT, '-c eslint.json', TEST_FILES);
-    //if (lastReturn.code !== 0) { errors++; }
-    //if (errors) { exit(1); }
+    if(some([
+        exec(ESLINT + ' ' + MAKEFILE).code,
+        exec(ESLINT + ' ' + JS_FILES).code
+        //exec(ESLINT + ' ' + TEST_FILES).code
+    ])) {
+        exit(1);
+    }
 };
 
 target.test = function () {
-    //var errors = 0,
-    //    lastReturn;
     target.lint();
     //
     //echo('Generating coverage');
