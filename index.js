@@ -5,7 +5,6 @@ var addon = require('flamingo/src/addon'),
     responseWriter = require('flamingo/src/writer/response'),
     envParser = require('flamingo/src/util/env-parser'),
 
-    RSVP = require('rsvp'),
     AWS = require('aws-sdk'),
     boom = require('boom'),
     s3Reader = require('./src/reader');
@@ -41,8 +40,8 @@ exports[addon.HOOKS.CONF] = function () {
 };
 
 exports[addon.HOOKS.ROUTES] = function (flamingo) {
-    const KEY_DELIMITER = '-';
-    var conf = flamingo.conf,
+    var KEY_DELIMITER = '-',
+        conf = flamingo.conf,
         profiles = flamingo.profiles,
         s3;
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global target, echo, find, exit */
+/* global target, echo, find, exit, exec */
 
 require('shelljs/make');
 
@@ -10,16 +10,9 @@ var partialRight = require('lodash/function/partialRight'),
 
 function ends(val) { return ary(partialRight(endsWith, val), 1); }
 
-var path = require('path'),
-    nodeCLI = require('shelljs-nodecli');
-
-var NODE = 'node',
-    NODE_MODULES = './node_modules/',
+var NODE_MODULES = './node_modules/',
     MAKEFILE = './Makefile.js',
     ESLINT = NODE_MODULES + 'eslint/bin/eslint.js',
-    ISTANBUL = 'istanbul',
-    MOCHA = NODE_MODULES + 'mocha/bin/_mocha',
-
     JS_FILES = find('src/').filter(ends('.js'))
         .concat('index.js')
         .join(' ');
