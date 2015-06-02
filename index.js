@@ -3,7 +3,6 @@ var addon = require('flamingo/src/addon'),
     errorReply = require('flamingo/src/util/error-reply'),
     imageProcessor = require('flamingo/src/processor/image'),
     responseWriter = require('flamingo/src/writer/response'),
-    envParser = require('flamingo/src/util/env-parser'),
 
     AWS = require('aws-sdk'),
     boom = require('boom'),

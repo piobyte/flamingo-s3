@@ -9,7 +9,7 @@
 
 ## Routes
 
-- `GET` `/s3/{bucketAlias}/{profile}/{key}` - convert item from [S3](https://aws.amazon.com/s3/) <sup>ROUTES.S3</sup>
+- `GET` `/s3/{bucketAlias}/{profile}/{key}` - convert item from [S3](https://aws.amazon.com/s3/)
     - __Note__: the server expects the key to be encoded using a `-`, example: `s3/foo/barprofile/wasd-directory-file.ext` (key: `directory/file.ext`)
     - The bucket parameter is an alias for the real bucket id. See `AWS.S3.BUCKETS`. Example:
     `AWS.S3.BUCKETS.myAlias = {name: 'foo-bar-wasd', path: 'bucket-path/'}` will map `/s3/myAlias/profile/wasd-dir-file.ext`
