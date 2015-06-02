@@ -9,7 +9,7 @@ var addon = require('flamingo/src/addon'),
     boom = require('boom'),
     s3Reader = require('./src/reader');
 
-var logger = require('flamingo/src/logger')('addon:flamingo-s3');
+var logger = require('flamingo/src/logger').build('addon:flamingo-s3');
 
 exports[addon.HOOKS.ENV] = function () {
     return [

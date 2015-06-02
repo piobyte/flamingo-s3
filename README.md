@@ -3,6 +3,7 @@
 [![Dependency Status](https://david-dm.org/piobyte/flamingo-s3.svg)](https://david-dm.org/piobyte/flamingo-s3)
 [![Code Climate](https://codeclimate.com/github/piobyte/flamingo-s3.png)](https://codeclimate.com/github/piobyte/flamingo-s3)
 ![npm version](https://badge.fury.io/js/flamingo-s3.svg)
+![MIT licensed](https://img.shields.io/github/license/piobyte/flamingo-s3.svg)
 
 `flamingo-s3` is a [flamingo](https://github.com/piobyte/flamingo) addon to allow reading and converting images from [s3](https://aws.amazon.com/s3/).
 

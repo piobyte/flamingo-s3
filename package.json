@@ -1,13 +1,12 @@
 {
   "name": "flamingo-s3",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "index.js",
   "description": "flamingo-s3 is a https://github.com/piobyte/flamingo addon to allow reading and converting images from https://aws.amazon.com/s3/.",
   "scripts": {
     "start": "node index.js",
-    "lint": "node Makefile.js lint",
-    "test": "node Makefile.js test",
-    "perf": "node Makefile.js perf"
+    "lint": "node make lint",
+    "test": "node make test"
   },
   "author": "Christian",
   "license": "MIT",
@@ -24,15 +23,11 @@
   "dependencies": {
     "aws-sdk": "^2.1.16",
     "boom": "^2.7.2",
-    "flamingo": "^1.0.0-rc.1",
+    "flamingo": "^1.0.0-rc.3",
     "lodash": "^3.6.0"
   },
   "devDependencies": {
     "eslint": "^0.17.1",
-    "istanbul": "^0.3.2",
-    "mocha": "^1.21.4",
-    "shelljs": "^0.3.0",
-    "shelljs-nodecli": "^0.1.1",
-    "sinon": "^1.10.3"
+    "shelljs": "^0.3.0"
   }
 }
