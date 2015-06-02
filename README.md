@@ -42,3 +42,29 @@ return {
     }
 };
 ```
+
+
+## Example
+
+1. `npm i --save flamingo-s3`
+2. `AWS_REGION=eu-central-1 AWS_SECRET=XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us% AWS_ACCESS_KEY=0!]FHTu)sSO&ph8jNJWT AWS_S3_BUCKETS={"pets":{"name":"my-pets","path":"my_pets/"}} node path/to/flamingo/index.js`
+    
+    - starts flamingo with the following `AWS` config and makes `localhost/s3/pets/avatar-image/12345-6789` available.
+    - requesting the URL will return the media file in the `my-pets` bucket that is assigned to the key `my_pets/12345/6789`. 
+        
+    ```
+    AWS: {
+        REGION: 'eu-west-1',
+        ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
+        SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
+        S3: {
+            VERSION: '2006-03-01',
+            BUCKETS: {
+                "pets":{
+                    "name":"my-pets",
+                    "path":"my_pets/"
+                }
+            }
+        }
+    }
+    ```

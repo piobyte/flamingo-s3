@@ -16,7 +16,7 @@ exports[addon.HOOKS.ENV] = function () {
         ['AWS_REGION', 'AWS.REGION'],
         ['AWS_SECRET', 'AWS.SECRET'],
         ['AWS_ACCESS_KEY', 'AWS.ACCESS_KEY'],
-        ['AWS_S3_BUCKETS', 'AWS.S3.BUCKETS', envParser.objectList('alias')]
+        ['AWS_S3_BUCKETS', 'AWS.S3.BUCKETS', JSON.parse]
     ];
 };
 
