@@ -19,6 +19,10 @@ addons:
     - imagemagick
 before_install:
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-- curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -
+- sudo bash curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-libvips.sh | sudo bash -
+- sudo bash curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-ffmpeg.sh | sudo bash -
+- sudo bash curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-imagemagick.sh | sudo bash -
+- sudo bash curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-graphicsmagick.sh | sudo bash -
+- sudo bash curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-flow.sh | sudo bash -
 install:
 - npm install

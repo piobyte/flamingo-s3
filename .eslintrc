@@ -2,7 +2,7 @@
     "rules": {
         "indent": [
             2,
-            4
+            2
         ],
         "quotes": [
             2,
@@ -19,6 +19,14 @@
     },
     "env": {
         "node": true
+    },
+    "globals": {
+        "describe": true,
+        "it": true,
+        "beforeEach": true,
+        "before": true,
+        "after": true,
+        "afterEach": true
     },
     "extends": "eslint:recommended"
 }

@@ -1,0 +1,11 @@
+[ignore]
+
+[include]
+src
+test
+index.js
+
+[libs]
+
+[options]
+module.system=node
