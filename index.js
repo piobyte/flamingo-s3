@@ -65,7 +65,12 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
         // extract bucket from key
           keySplit = req.params.key.split(KEY_DELIMITER),
           key = keySplit.slice(-2).join('/'),
+          op = req.flamingoOperation,
+          conf = op.config,
           bucket = conf.AWS.S3.BUCKETS[bucketAlias];
+
+        op.request = req;
+        op.reply = reply;
 
         if (!conf.AWS.S3.BUCKETS.hasOwnProperty(bucketAlias)) {
           return reply(boom.badRequest('Unknown bucket alias'));
@@ -76,12 +81,16 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
           return reply(boom.badRequest('Unknown profile'));
         }
 
-        profiles[profileName](req, flamingo.conf).then(function (profile) {
+        profiles[profileName](op.request, op.config).then(function (profile) {
+
+          op.profile = profile;
+          op.writer = responseWriter;
+
           // build processing queue
           return s3Reader(bucket.name, bucket.path + key, s3)
             .then(unfoldReaderResult)
-            .then(imageProcessor(profile.process, conf))
-            .then(responseWriter(null, reply, profile.response));
+            .then(imageProcessor(op))
+            .then(responseWriter(op));
         }).catch(function (err) {
           logger.error({
             error: err,

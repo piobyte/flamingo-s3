@@ -7,7 +7,7 @@
     "lint": "node node_modules/eslint/bin/eslint.js index.js test src",
     "typecheck": "if [[ $(command -v flow) ]] ; then { flow check >&2; } ; else { echo \"flow command not available, skipping type checking\" >&2; } ; fi",
     "pretest": "npm run lint && npm run typecheck",
-    "test": "TEST=true npm run cover",
+    "test": "",
     "cover": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha",
     "preversion": "npm run test"
   },
@@ -24,9 +24,9 @@
     "url": "https://github.com/piobyte/flamingo-s3"
   },
   "dependencies": {
-    "aws-sdk": "^2.2.4",
+    "aws-sdk": "^2.2.30",
     "boom": "^2.9.0",
-    "flamingo": "^1.2.0",
+    "flamingo": "^1.4.0",
     "lodash": "^3.10.1"
   },
   "devDependencies": {

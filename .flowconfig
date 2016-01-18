@@ -6,6 +6,7 @@ test
 index.js
 
 [libs]
+node_modules/flamingo/flow/
 
 [options]
 module.system=node
