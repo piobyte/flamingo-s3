@@ -3,6 +3,8 @@ var assert = require('assert'),
   nock = require('nock'),
   path = require('path'),
   RSVP = require('rsvp'),
+  fs = require('fs'),
+  AWS = require('aws-sdk'),
   request = RSVP.denodeify(require('request')),
   server = require('flamingo/src/server'),
   conf = require('flamingo/config'),
@@ -67,11 +69,64 @@ describe('flamingo-s3 server response', function () {
         request('http://localhost:' + PORT + '/s3/cats/unknown-profile/foo-bar')
       ]);
     }).then(function (responses) {
-      responses.forEach(function(response){
+      responses.forEach(function (response) {
         assert.equal(response.statusCode, 400);
       });
 
       server.stop(done);
     }).catch(done);
+  });
+
+  it('returns the image for valid s3 objects', function (done) {
+    var bucketName = 'secret-cats-bucket-name',
+      fileDir = 'fixtures/',
+      file = 'fixture.jpg',
+      s3,
+      fixture = path.join(__dirname, '../fixtures/23797956634_d90e17a27a_o.jpg');
+
+    AWS.config.update({
+      // config for fake s3 server (only used in testing)
+      accessKeyId: '123',
+      secretAccessKey: 'abc',
+      endpoint: 'localhost:4567',
+      sslEnabled: false,
+      s3ForcePathStyle: true
+    });
+
+    s3 = new AWS.S3('2006-03-01');
+
+    fs.stat(fixture, function (err, stat) {
+      if (err) done(err);
+
+      s3.putObject({
+        Bucket: bucketName,
+        Key: 'cats/' + fileDir + file,
+        ContentLength: stat.size,
+        Body: fs.createReadStream(fixture)
+      }, function (err) {
+        if (err) done(err);
+
+        startServer({
+          AWS: {
+            S3: {
+              BUCKETS: {
+                cats: {
+                  name: bucketName,
+                  path: 'cats/'
+                }
+              }
+            }
+          }
+        }).then(function (s) {
+          server = s;
+
+          return request('http://localhost:' + PORT + '/s3/cats/avatar-image/fixtures-fixture.jpg')
+            .then(function (response) {
+              assert.equal(response.statusCode, 200);
+              server.stop(done);
+            });
+        }).catch(done);
+      });
+    });
   });
 });

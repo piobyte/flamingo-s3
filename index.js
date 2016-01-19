@@ -45,7 +45,14 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
     profiles = flamingo.profiles,
     s3;
 
-  AWS.config.update({
+  AWS.config.update(process.env.TEST ? {
+    // config for fake s3 server (only used in testing)
+    accessKeyId: '123',
+    secretAccessKey: 'abc',
+    endpoint: 'localhost:4567',
+    sslEnabled: false,
+    s3ForcePathStyle: true
+  } : {
     accessKeyId: conf.AWS.ACCESS_KEY,
     secretAccessKey: conf.AWS.SECRET,
     region: conf.AWS.REGION
@@ -59,18 +66,18 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
     config: {
       cors: true,
       description: 'Load an image from n S3 bucket and convert it using a profile.',
-      handler: function (req, reply) {
-        var bucketAlias = req.params.bucketAlias,
-          profileName = req.params.profile,
+      handler: function (request, reply) {
+        var operation = request.flamingoOperation,
+          bucketAlias = request.params.bucketAlias,
+          profileName = request.params.profile,
         // extract bucket from key
-          keySplit = req.params.key.split(KEY_DELIMITER),
+          keySplit = request.params.key.split(KEY_DELIMITER),
+          // take last two splits
           key = keySplit.slice(-2).join('/'),
-          op = req.flamingoOperation,
-          conf = op.config,
+          conf = operation.config,
           bucket = conf.AWS.S3.BUCKETS[bucketAlias];
 
-        op.request = req;
-        op.reply = reply;
+        operation.reply = reply;
 
         if (!conf.AWS.S3.BUCKETS.hasOwnProperty(bucketAlias)) {
           return reply(boom.badRequest('Unknown bucket alias'));
@@ -81,21 +88,20 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
           return reply(boom.badRequest('Unknown profile'));
         }
 
-        profiles[profileName](op.request, op.config).then(function (profile) {
-
-          op.profile = profile;
-          op.writer = responseWriter;
+        profiles[profileName](operation.request, operation.config).then(function (profile) {
+          operation.profile = profile;
+          operation.writer = responseWriter;
 
           // build processing queue
           return s3Reader(bucket.name, bucket.path + key, s3)
             .then(unfoldReaderResult)
-            .then(imageProcessor(op))
-            .then(responseWriter(op));
+            .then(imageProcessor(operation))
+            .then(responseWriter(operation));
         }).catch(function (err) {
           logger.error({
             error: err,
-            request: req
-          }, 'S3 image convert error for ' + req.path);
+            request: request
+          }, 'S3 image convert error for ' + request.path);
           errorReply(reply, err);
         });
       }
