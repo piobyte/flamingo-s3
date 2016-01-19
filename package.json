@@ -1,6 +1,6 @@
 {
   "name": "flamingo-s3",
-  "version": "1.1.0-rc.1",
+  "version": "1.1.0",
   "main": "index.js",
   "description": "flamingo-s3 is a https://github.com/piobyte/flamingo addon to allow reading and converting images from https://aws.amazon.com/s3/.",
   "scripts": {
