@@ -5,7 +5,7 @@
   "description": "flamingo-s3 is a https://github.com/piobyte/flamingo addon to allow reading and converting images from https://aws.amazon.com/s3/.",
   "scripts": {
     "lint": "node node_modules/eslint/bin/eslint.js index.js test src",
-    "typecheck": "if [[ $(command -v flow) ]] ; then { flow check >&2; } ; else { echo \"flow command not available, skipping type checking\" >&2; } ; fi",
+    "typecheck": "node_modules/.bin/flow check",
     "pretest": "bash tools/start-fakes3.sh && npm run lint && npm run typecheck",
     "test": "TEST=true npm run cover",
     "posttest": "bash tools/stop-fakes3.sh",
@@ -27,11 +27,12 @@
   "dependencies": {
     "aws-sdk": "^2.2.30",
     "boom": "^2.9.0",
-    "flamingo": "^1.5.0",
+    "flamingo": "^1.6.0",
     "lodash": "^3.10.1"
   },
   "devDependencies": {
-    "eslint": "^1.5.1",
+    "eslint": "^2.11.1",
+    "flow-bin": "^0.26.0",
     "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
     "nock": "^2.17.0",

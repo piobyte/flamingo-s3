@@ -4,8 +4,8 @@ cache:
   directories:
   - node_modules
 node_js:
-- '5.0'
-- '4.2'
+- '6'
+- '4'
 - '0.12'
 - 'iojs'
 sudo: 9000
@@ -18,10 +18,8 @@ addons:
 before_install:
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
 - sudo apt-get -y install rubygems
-- curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-libvips.sh | sudo bash -
 - curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-ffmpeg.sh | sudo bash -
 - curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-imagemagick.sh | sudo bash -
 - curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-graphicsmagick.sh | sudo bash -
-- curl -s https://raw.githubusercontent.com/piobyte/flamingo/master/tools/install-flow.sh | sudo bash -
 install:
 - npm install

@@ -1,13 +1,13 @@
 /* @flow weak */
-var addon = require('flamingo/src/addon'),
-  unfoldReaderResult = require('flamingo/src/util/unfold-reader-result'),
-  errorReply = require('flamingo/src/util/error-reply'),
-  imageProcessor = require('flamingo/src/processor/image'),
-  responseWriter = require('flamingo/src/writer/response'),
+var addon = require('flamingo/src/addon');
+var unfoldReaderResult = require('flamingo/src/util/unfold-reader-result');
+var errorReply = require('flamingo/src/util/error-reply');
+var imageProcessor = require('flamingo/src/processor/image');
+var responseWriter = require('flamingo/src/writer/response');
 
-  AWS = require('aws-sdk'),
-  boom = require('boom'),
-  s3Reader = require('./src/reader');
+var AWS = require('aws-sdk');
+var boom = require('boom');
+var s3Reader = require('./src/reader');
 
 var logger = require('flamingo/src/logger').build('addon:flamingo-s3');
 
@@ -40,10 +40,10 @@ exports[addon.HOOKS.CONF] = function () {
 };
 
 exports[addon.HOOKS.ROUTES] = function (flamingo) {
-  var KEY_DELIMITER = '-',
-    conf = flamingo.conf,
-    profiles = flamingo.profiles,
-    s3;
+  var KEY_DELIMITER = '-';
+  var conf = flamingo.conf;
+  var profiles = flamingo.profiles;
+  var s3;
 
   AWS.config.update(process.env.TEST ? {
     // config for fake s3 server (only used in testing)
@@ -67,15 +67,15 @@ exports[addon.HOOKS.ROUTES] = function (flamingo) {
       cors: true,
       description: 'Load an image from n S3 bucket and convert it using a profile.',
       handler: function (request, reply) {
-        var operation = request.flamingoOperation,
-          bucketAlias = request.params.bucketAlias,
-          profileName = request.params.profile,
+        var operation = request.flamingoOperation;
+        var bucketAlias = request.params.bucketAlias;
+        var profileName = request.params.profile;
         // extract bucket from key
-          keySplit = request.params.key.split(KEY_DELIMITER),
-          // take last two splits
-          key = keySplit.slice(-2).join('/'),
-          conf = operation.config,
-          bucket = conf.AWS.S3.BUCKETS[bucketAlias];
+        var keySplit = request.params.key.split(KEY_DELIMITER);
+        // take last two splits
+        var key = keySplit.slice(-2).join('/');
+        var conf = operation.config;
+        var bucket = conf.AWS.S3.BUCKETS[bucketAlias];
 
         operation.reply = reply;
 

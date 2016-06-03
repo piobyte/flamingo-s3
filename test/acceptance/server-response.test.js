@@ -1,35 +1,35 @@
-var assert = require('assert'),
-  merge = require('lodash/object/merge'),
-  nock = require('nock'),
-  path = require('path'),
-  RSVP = require('rsvp'),
-  fs = require('fs'),
-  AWS = require('aws-sdk'),
-  request = RSVP.denodeify(require('request')),
-  server = require('flamingo/src/server'),
-  conf = require('flamingo/config'),
-  discovery = require('flamingo/src/addon/discovery'),
-  addons = require('flamingo/src/addon/loader'),
-  flamingoAddon = require('flamingo/src/addon/index');
+var assert = require('assert');
+var merge = require('lodash/object/merge');
+var nock = require('nock');
+var path = require('path');
+var RSVP = require('rsvp');
+var fs = require('fs');
+var AWS = require('aws-sdk');
+var request = RSVP.denodeify(require('request'));
+var server = require('flamingo/src/server');
+var conf = require('flamingo/config');
+var discovery = require('flamingo/src/addon/discovery');
+var addons = require('flamingo/src/addon/loader');
+var flamingoAddon = require('flamingo/src/addon/index');
 
 var PORT = 43723; // some random unused port
 
 function startServer(localConf) {
-  var _hooks = {},
-    serverConf = merge({}, conf, {
-      PORT: PORT,
-      AWS: {
-        REGION: 'eu-west-1',
-        ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
-        SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
-        S3: {
-          VERSION: '2006-03-01',
-          BUCKETS: {}
-        }
+  var _hooks = {};
+  var serverConf = merge({}, conf, {
+    PORT: PORT,
+    AWS: {
+      REGION: 'eu-west-1',
+      ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
+      SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
+      S3: {
+        VERSION: '2006-03-01',
+        BUCKETS: {}
       }
-    }, localConf),
-    _addons = [discovery.resolvePkg(discovery.fromPackage(path.join(__dirname, '../..')))],
-    registeredHooks = addons.registerAddonHooks(_addons, _hooks);
+    }
+  }, localConf);
+  var _addons = [discovery.resolvePkg(discovery.fromPackage(path.join(__dirname, '../..')))];
+  var registeredHooks = addons.registerAddonHooks(_addons, _hooks);
 
   addons.finalize(addons, registeredHooks);
   addons.hook(flamingoAddon.HOOKS.CONF)(conf);
@@ -78,11 +78,11 @@ describe('flamingo-s3 server response', function () {
   });
 
   it('returns the image for valid s3 objects', function (done) {
-    var bucketName = 'secret-cats-bucket-name',
-      fileDir = 'fixtures/',
-      file = 'fixture.jpg',
-      s3,
-      fixture = path.join(__dirname, '../fixtures/23797956634_d90e17a27a_o.jpg');
+    var bucketName = 'secret-cats-bucket-name';
+    var fileDir = 'fixtures/';
+    var file = 'fixture.jpg';
+    var s3;
+    var fixture = path.join(__dirname, '../fixtures/23797956634_d90e17a27a_o.jpg');
 
     AWS.config.update({
       // config for fake s3 server (only used in testing)
