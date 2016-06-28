@@ -1,104 +1,98 @@
-var assert = require('assert');
-var sinon = require('sinon');
-var reader = require('../../src/reader');
+const assert = require('assert');
+const sinon = require('sinon');
+const reader = require('../../src/reader');
+const Promise = require('bluebird');
 
 describe('reader', function () {
-  it('passes given bucket and key to s3 sdk methods', function (done) {
-    var BUCKET = 'bucket';
-    var KEY = 'key';
-    var S3_PARAMS = {
+  it('passes given bucket and key to s3 sdk methods', function () {
+    const BUCKET = 'bucket';
+    const KEY = 'key';
+    const S3_PARAMS = {
       Bucket: BUCKET,
       Key: KEY
     };
-    var s3 = {
-      headObject: function (params, cb) {
+    const s3 = {
+      headObject(params) {
         assert.deepEqual(params, S3_PARAMS);
-        cb();
+        return {
+          promise: () => Promise.resolve()
+        };
       },
       getObject: function (params) {
         assert.deepEqual(params, S3_PARAMS);
       }
     };
 
-    reader(BUCKET, KEY, s3).then(function () {
-      done();
-    }).catch(done);
+    return reader(BUCKET, KEY, s3);
   });
 
-  it('checks that the bucket exists before resolving the stream object', function (done) {
-    var calledHead = false;
-    var BUCKET = 'bucket';
-    var KEY = 'key';
-    var s3 = {
-      headObject: function (_, cb) {
+  it('checks that the bucket exists before resolving the stream object', function () {
+    let calledHead = false;
+    const BUCKET = 'bucket';
+    const KEY = 'key';
+    const s3 = {
+      headObject: function () {
         calledHead = true;
-        cb();
+        return {promise: () => Promise.resolve()};
       },
       getObject: sinon.spy()
     };
 
-    reader(BUCKET, KEY, s3).then(function (data) {
+    return reader(BUCKET, KEY, s3).then(function (data) {
       assert.ok(calledHead, 'called headObject');
       assert.ok(data.stream, 'has stream method');
-      done();
-    }).catch(done);
-  });
-
-  it('rejects if headObject fails', function (done) {
-    var headError = {foo: 'bar'};
-    var BUCKET = 'bucket';
-    var KEY = 'key';
-    var s3 = {
-      headObject: function (_, cb) {
-        cb(headError);
-      }
-    };
-
-    reader(BUCKET, KEY, s3).then(function () {
-      done('shouldn\'t resolve');
-    }).catch(function (data) {
-      assert.deepEqual(data, headError);
-      done();
     });
   });
 
-  it('resolved stream object calls s3 api createReadStream method', function (done) {
-    var createReadStream = sinon.spy();
-    var BUCKET = 'bucket';
-    var KEY = 'key';
-    var s3 = {
-      headObject: function (_, cb) {
-        cb();
-      },
-      getObject: function () {
-        return {
-          createReadStream: createReadStream
-        };
+  it('rejects if headObject fails', function () {
+    const headError = {foo: 'bar'};
+    const BUCKET = 'bucket';
+    const KEY = 'key';
+    const s3 = {
+      headObject: function (_) {
+        return {promise: () => Promise.reject(headError)};
       }
     };
 
-    reader(BUCKET, KEY, s3).then(function (data) {
-      data.stream();
-
-      assert.ok(data.stream, 'has stream method');
-      assert.ok(createReadStream.called, 'called object.createReadStream');
-      done();
-    }).catch(done);
+    return reader(BUCKET, KEY, s3).then(function () {
+      assert.ok(false, 'shouldn\'t resolve');
+    }).catch(function (data) {
+      assert.deepEqual(data, headError);
+    });
   });
 
-  it('resolved reader type "s3"', function (done) {
-    var BUCKET = 'bucket';
-    var KEY = 'key';
-    var s3 = {
-      headObject: function (_, cb) {
-        cb();
+  it('resolved stream object calls s3 api createReadStream method', function () {
+    const createReadStream = sinon.spy();
+    const BUCKET = 'bucket';
+    const KEY = 'key';
+    const s3 = {
+      headObject: function () {
+        return {promise: () => Promise.resolve()};
+      },
+      getObject: function () {
+        return {createReadStream};
+      }
+    };
+
+    return reader(BUCKET, KEY, s3).then(function (data) {
+      data.stream();
+      assert.ok(data.stream, 'has stream method');
+      assert.ok(createReadStream.called, 'called object.createReadStream');
+    });
+  });
+
+  it('resolved reader type "s3"', function () {
+    const BUCKET = 'bucket';
+    const KEY = 'key';
+    const s3 = {
+      headObject: function () {
+        return {promise: () => Promise.resolve()};
       },
       getObject: sinon.spy()
     };
 
-    reader(BUCKET, KEY, s3).then(function (data) {
+    return reader(BUCKET, KEY, s3).then(function (data) {
       assert.strictEqual(data.type, 's3');
-      done();
-    }).catch(done);
+    });
   });
 });

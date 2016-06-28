@@ -1,41 +1,42 @@
-var assert = require('assert');
-var merge = require('lodash/object/merge');
-var nock = require('nock');
-var path = require('path');
-var RSVP = require('rsvp');
-var fs = require('fs');
-var AWS = require('aws-sdk');
-var request = RSVP.denodeify(require('request'));
-var server = require('flamingo/src/server');
-var conf = require('flamingo/config');
-var discovery = require('flamingo/src/addon/discovery');
-var addons = require('flamingo/src/addon/loader');
-var flamingoAddon = require('flamingo/src/addon/index');
+const assert = require('assert');
+const merge = require('lodash/merge');
+const noop = require('lodash/noop');
+const nock = require('nock');
+const path = require('path');
+const fs = require('fs');
 
-var PORT = 43723; // some random unused port
+const Promise = require('bluebird');
+const AWS = require('aws-sdk');
+const got = require('got');
+const Server = require('flamingo/src/model/server');
+const Config = require('flamingo/config');
+const AddonLoader = require('flamingo/src/addon/loader');
+const exampleProfiles = require('flamingo/src/profiles/examples');
+const S3Route = require('../../src/route');
+const stat = Promise.promisify(fs.stat);
+
+const PORT = 43723; // some random unused port
 
 function startServer(localConf) {
-  var _hooks = {};
-  var serverConf = merge({}, conf, {
-    PORT: PORT,
-    AWS: {
-      REGION: 'eu-west-1',
-      ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
-      SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
-      S3: {
-        VERSION: '2006-03-01',
-        BUCKETS: {}
+  return Config.fromEnv().then(config => {
+    config = merge({}, config, {
+      PORT: PORT,
+      AWS: {
+        REGION: 'eu-west-1',
+        ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
+        SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
+        S3: {
+          VERSION: '2006-03-01',
+          BUCKETS: {}
+        }
       }
-    }
-  }, localConf);
-  var _addons = [discovery.resolvePkg(discovery.fromPackage(path.join(__dirname, '../..')))];
-  var registeredHooks = addons.registerAddonHooks(_addons, _hooks);
+    }, localConf);
 
-  addons.finalize(addons, registeredHooks);
-  addons.hook(flamingoAddon.HOOKS.CONF)(conf);
-  addons.hook(flamingoAddon.HOOKS.ENV)(conf, process.env);
-
-  return server(serverConf, addons);
+    return new Server(config, {hook: () => noop})
+      .withProfiles([exampleProfiles])
+      .withRoutes([new S3Route(config)])
+      .start();
+  });
 }
 
 describe('flamingo-s3 server response', function () {
@@ -43,10 +44,10 @@ describe('flamingo-s3 server response', function () {
     nock.cleanAll();
   });
 
-  it('returns 400 for unknown bucket alias, bad key format and unknown profile', function (done) {
-    var server;
+  it('returns 400 for unknown bucket alias, bad key format and unknown profile', function () {
+    let server;
 
-    startServer({
+    return startServer({
       AWS: {
         S3: {
           BUCKETS: {
@@ -60,29 +61,27 @@ describe('flamingo-s3 server response', function () {
     }).then(function (s) {
       server = s;
 
-      return RSVP.all([
+      return Promise.all([
         // unknown alias
-        request('http://localhost:' + PORT + '/s3/dogs/avatar-image/123'),
+        got(`http://localhost:${PORT}/s3/dogs/avatar-image/123`).catch(e => e),
         // unknown profile
-        request('http://localhost:' + PORT + '/s3/cats/avatar-image/123'),
+        got(`http://localhost:${PORT}/s3/cats/avatar-image/123`).catch(e => e),
         // bad key format
-        request('http://localhost:' + PORT + '/s3/cats/unknown-profile/foo-bar')
+        got(`http://localhost:${PORT}/s3/cats/unknown-profile/foo-bar`).catch(e => e)
       ]);
     }).then(function (responses) {
-      responses.forEach(function (response) {
-        assert.equal(response.statusCode, 400);
-      });
+      responses
+        .forEach((response) => assert.equal(response.statusCode, 400));
 
-      server.stop(done);
-    }).catch(done);
+      return server.stop();
+    });
   });
 
-  it('returns the image for valid s3 objects', function (done) {
-    var bucketName = 'secret-cats-bucket-name';
-    var fileDir = 'fixtures/';
-    var file = 'fixture.jpg';
-    var s3;
-    var fixture = path.join(__dirname, '../fixtures/23797956634_d90e17a27a_o.jpg');
+  it('returns the image for valid s3 objects', function () {
+    const bucketName = 'secret-cats-bucket-name';
+    const fileDir = 'fixtures/';
+    const file = 'fixture.jpg';
+    const fixture = path.join(__dirname, '../fixtures/23797956634_d90e17a27a_o.jpg');
 
     AWS.config.update({
       // config for fake s3 server (only used in testing)
@@ -93,40 +92,44 @@ describe('flamingo-s3 server response', function () {
       s3ForcePathStyle: true
     });
 
-    s3 = new AWS.S3('2006-03-01');
-
-    fs.stat(fixture, function (err, stat) {
-      if (err) done(err);
-
-      s3.putObject({
-        Bucket: bucketName,
-        Key: 'cats/' + fileDir + file,
-        ContentLength: stat.size,
-        Body: fs.createReadStream(fixture)
-      }, function (err) {
-        if (err) done(err);
-
-        startServer({
-          AWS: {
-            S3: {
-              BUCKETS: {
-                cats: {
-                  name: bucketName,
-                  path: 'cats/'
-                }
-              }
+    return Config.fromEnv().then((config) => {
+      config.PORT = PORT;
+      config.AWS = {
+        S3: {
+          BUCKETS: {
+            cats: {
+              name: bucketName,
+              path: 'cats/'
             }
           }
-        }).then(function (s) {
-          server = s;
+        }
+      };
 
-          return request('http://localhost:' + PORT + '/s3/cats/avatar-image/fixtures-fixture.jpg')
-            .then(function (response) {
-              assert.equal(response.statusCode, 200);
-              server.stop(done);
+      const s3Route = new S3Route(config);
+      return stat(fixture)
+        .then(({size}) =>
+          s3Route.s3.putObject({
+            Bucket: bucketName,
+            Key: 'cats/' + fileDir + file,
+            ContentLength: size,
+            Body: fs.createReadStream(fixture)
+          }).promise())
+        .then(() => {
+          return new Server(config, new AddonLoader(__dirname, {}).load())
+            .withProfiles([exampleProfiles])
+            .withRoutes([s3Route])
+            .start()
+            .then(server => {
+              console.log(`server running at ${server.hapi.info.uri}`);
+              return server;
             });
-        }).catch(done);
-      });
+        });
+    }).then((server) => {
+      return got(`http://localhost:${PORT}/s3/cats/avatar-image/fixtures-fixture.jpg`)
+        .then(function (response) {
+          assert.equal(response.statusCode, 200);
+          return server.stop();
+        });
     });
   });
 });
