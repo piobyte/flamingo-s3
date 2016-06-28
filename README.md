@@ -18,8 +18,8 @@
 
 # Documentation
 
-see [flamingo-s3 docs](piobyte.github.com/flamingo-s3)
+see [flamingo-s3 docs](https://piobyte.github.io/flamingo-s3/index.html)
 
 # Tutorials 
 
-see [flamingo-s3 introduction](piobyte.github.com/flamingo-s3)
+for basic installation and setup see [flamingo-s3/tutorial-usage](https://piobyte.github.io/flamingo-s3/tutorial-usage.html)

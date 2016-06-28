@@ -21,7 +21,6 @@ BRANCH_NAME=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
   rm -rf docs || exit 0;
   mkdir docs;
 
-  npm run formats
   npm run docs
   mv ${DOCS_DIR}/${NAME}/${VERSION}/* ${DOCS_DIR}
   rm -rf "docs/${NAME}"
