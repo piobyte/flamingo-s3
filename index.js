@@ -9,6 +9,7 @@ const addon = require('flamingo/src/addon');
  * Returns s3 environment mappings
  * @return {Array} environment mappings
  * @name ENV
+ * @function
  * @example
  * `AWS_REGION` => `AWS.REGION`
  * `AWS_SECRET` => `AWS.SECRET`
@@ -27,6 +28,7 @@ exports[addon.HOOKS.ENV] = function() {
 /**
  * Returns default addon configuration
  * @name CONF
+ * @function
  * @return {{AWS: {REGION: string, ACCESS_KEY: string, SECRET: string, S3: {VERSION: string, BUCKETS: {alias: {name: string, path: string}}}}}}
  */
 exports[addon.HOOKS.CONF] = function() {
