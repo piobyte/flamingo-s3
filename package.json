@@ -1,6 +1,6 @@
 {
   "name": "flamingo-s3",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "main": "index.js",
   "description": "flamingo-s3 is a https://github.com/piobyte/flamingo addon to allow reading and converting images from https://aws.amazon.com/s3/.",
   "scripts": {
@@ -8,7 +8,7 @@
     "typecheck": "node_modules/.bin/flow check",
     "pretest": "npm run lint && npm run typecheck && bash tools/start-fakes3.sh",
     "test": "TEST=true npm run cover",
-    "docs": "node node_modules/jsdoc/jsdoc.js index.js src -r -u tutorials -t ./node_modules/minami -P package.json -R README.md -d docs",
+    "docs": "node node_modules/jsdoc/jsdoc.js index.js src -r -u tutorials -t ./node_modules/postman-jsdoc-theme -P package.json -R README.md -d docs",
     "posttest": "bash tools/stop-fakes3.sh",
     "cover": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha",
     "preversion": "npm run test"
@@ -29,21 +29,21 @@
     "url": "https://github.com/piobyte/flamingo-s3"
   },
   "dependencies": {
-    "aws-sdk": "^2.4.2",
+    "aws-sdk": "^2.5.0",
     "boom": "^3.2.2",
-    "flamingo": "^2.0.0-alpha.4",
-    "lodash": "^4.13.1"
+    "flamingo": "^2.0.0-alpha.10",
+    "lodash": "^4.14.2"
   },
   "devDependencies": {
     "bluebird": "^3.4.1",
-    "eslint": "^2.13.1",
-    "flow-bin": "^0.27.0",
+    "eslint": "^3.2.2",
+    "flow-bin": "^0.30.0",
     "got": "^6.3.0",
     "istanbul": "^0.4.4",
     "jsdoc": "^3.4.0",
-    "minami": "^1.1.1",
-    "mocha": "^2.5.3",
+    "postman-jsdoc-theme": "0.0.2",
+    "mocha": "^3.0.2",
     "nock": "^8.0.0",
-    "sinon": "^1.17.4"
+    "sinon": "^1.17.5"
   }
 }
