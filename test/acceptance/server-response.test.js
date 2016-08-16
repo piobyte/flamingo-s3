@@ -1,6 +1,5 @@
 const assert = require('assert');
-const merge = require('lodash/merge');
-const noop = require('lodash/noop');
+const merge = require('lodash.merge');
 const nock = require('nock');
 const path = require('path');
 const fs = require('fs');
@@ -16,6 +15,8 @@ const S3Route = require('../../src/route');
 const stat = Promise.promisify(fs.stat);
 
 const PORT = 43723; // some random unused port
+
+const noop = () => {};
 
 function startServer(localConf) {
   return Config.fromEnv().then(config => {
