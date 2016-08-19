@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/route.js - Postman Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Tutorials</h3><ul><li><a href="tutorial-usage.html">Basic usage</a></li></ul><h3>Classes</h3><ul><li><a href="S3Route.html">S3Route</a></li></ul><h3>Modules</h3><ul><li><a href="module-flamingo-s3_index.html">flamingo-s3/index</a><ul class='methods'><li data-type='method'><a href="module-flamingo-s3_index.html#~CONF">CONF</a></li><li data-type='method'><a href="module-flamingo-s3_index.html#~ENV">ENV</a></li></ul></li><li><a href="module-flamingo-s3_src_reader.html">flamingo-s3/src/reader</a><ul class='methods'><li data-type='method'><a href="module-flamingo-s3_src_reader.html#~s3Reader">s3Reader</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Image.html">Image</a></li></ul><h3>Mixins</h3><ul><li><a href="S3.html">S3</a><ul class='methods'><li data-type='method'><a href="S3.html#extractInput">extractInput</a></li><li data-type='method'><a href="S3.html#extractReader">extractReader</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/route.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const S3Mixin = require('./mixin');
+const Image = require('flamingo/src/routes/image');
+
+/**
+ * Flamingo Image route
+ * @external Image
+ * @see {@link https://piobyte.github.io/flamingo/Image.html|Image}
+ */
+
+/**
+ * Route that converts an image, stored on aws s3
+ * @class
+ * @mixes S3
+ * @extends external:Image
+ */
+class S3Route extends S3Mixin(Image) {
+  constructor(conf, method = 'GET', path = '/s3/{bucketAlias}/{profile}/{key}', description = 'Profile conversion based on aws s3 input') {
+    super(conf, method, path, description);
+  }
+}
+
+module.exports = S3Route;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Fri Aug 19 2016 09:29:58 GMT+0200 (CEST)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
