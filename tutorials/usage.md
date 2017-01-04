@@ -13,8 +13,10 @@ const AddonLoader = require('flamingo/src/addon/loader');
 const profiles = require('flamingo/src/profiles/examples');
 const S3Route = require('flamingo-s3/src/route');
 
+const pkg = require('./package.json');
+
 Config.fromEnv().then(config => {
-  return new Server(config, new AddonLoader(__dirname, {}).load())
+  return new Server(config, new AddonLoader(__dirname, pkg).load())
     .withProfiles([profiles])
     .withRoutes([new S3Route(config)])
     .start()
