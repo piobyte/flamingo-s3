@@ -1,9 +1,17 @@
 /* @flow weak */
+
+/**
+ * Flamingo Server instance
+ * @external Server
+ * @see {@link https://piobyte.github.io/flamingo/Server.html|Server}
+ */
+
 /**
  * S3 addon hooks
  * @module flamingo-s3/index
  */
 const addon = require('flamingo/src/addon');
+const AWS = require('aws-sdk');
 
 /**
  * Returns s3 environment mappings
@@ -48,4 +56,24 @@ exports[addon.HOOKS.CONF] = function() {
       }
     }
   };
+};
+
+/**
+ * Update AWS config on start and create a AWS-S3 client (`s3Client` variable) on the server instance.
+ *
+ * @name START
+ * @function
+ * @param {Server} server server instance
+ */
+exports[addon.HOOKS.START] = function(server){
+  AWS.config.update({
+    accessKeyId: server.config.AWS.ACCESS_KEY,
+    secretAccessKey: server.config.AWS.SECRET,
+    region: server.config.AWS.REGION,
+    apiVersion: server.config.AWS.S3.VERSION
+  });
+  if (!server.s3Client) {
+    //NOTE: s3Client is a private field and shouldn't be relied on apart from the implemented behavior.
+    server.s3Client = new AWS.S3();
+  }
 };

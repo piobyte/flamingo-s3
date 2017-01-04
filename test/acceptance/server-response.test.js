@@ -16,22 +16,12 @@ const stat = Promise.promisify(fs.stat);
 
 const PORT = 43723; // some random unused port
 
-const noop = () => {};
+const noop = () => {
+};
 
 function startServer(localConf) {
   return Config.fromEnv().then(config => {
-    config = merge({}, config, {
-      PORT: PORT,
-      AWS: {
-        REGION: 'eu-west-1',
-        ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
-        SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
-        S3: {
-          VERSION: '2006-03-01',
-          BUCKETS: {}
-        }
-      }
-    }, localConf);
+    config = merge({}, config, {PORT}, localConf);
 
     return new Server(config, {hook: () => noop})
       .withProfiles([exampleProfiles])
@@ -78,6 +68,37 @@ describe('flamingo-s3 server response', function () {
     });
   });
 
+  it('configures AWS from given config', function () {
+    return Config.fromEnv().then(config => {
+      config = merge({}, config, {
+        PORT,
+        AWS: {
+          ACCESS_KEY: '123',
+          SECRET: 'abc'
+        }
+      });
+
+      // manually load module as addon
+      const loader = new AddonLoader(path.join(__dirname, '..', '..'), {'flamingo-s3': '*',});
+      loader.addons = [{
+        pkg: require('../../package.json'),
+        path: path.join(__dirname, '..', '..'),
+        hooks: require('../../index')
+      }];
+      loader.finalize(loader.reduceAddonsToHooks(loader.addons, loader._hooks));
+
+      return new Server(config, loader.load())
+        .withProfiles([exampleProfiles])
+        .withRoutes([new S3Route(config)])
+        .start();
+    }).then(server => {
+      assert.equal(server.s3Client.config.credentials.accessKeyId, '123');
+      assert.equal(server.s3Client.config.credentials.secretAccessKey, 'abc');
+
+      return server.stop();
+    });
+  });
+
   it('returns the image for valid s3 objects', function () {
     const bucketName = 'secret-cats-bucket-name';
     const fileDir = 'fixtures/';
@@ -86,45 +107,53 @@ describe('flamingo-s3 server response', function () {
 
     AWS.config.update({
       // config for fake s3 server (only used in testing)
-      accessKeyId: '123',
-      secretAccessKey: 'abc',
       endpoint: 'localhost:4567',
       sslEnabled: false,
       s3ForcePathStyle: true
     });
 
-    return Config.fromEnv().then((config) => {
-      config.PORT = PORT;
-      config.AWS = {
-        S3: {
-          BUCKETS: {
-            cats: {
-              name: bucketName,
-              path: 'cats/'
+    return Config.fromEnv().then(config => {
+      config = merge({}, config, {
+        PORT,
+        AWS: {
+          ACCESS_KEY: '123',
+          SECRET: 'abc',
+          S3: {
+            BUCKETS: {
+              cats: {
+                name: bucketName,
+                path: 'cats/'
+              }
             }
           }
         }
-      };
+      });
 
-      const s3Route = new S3Route(config);
-      return stat(fixture)
-        .then(({size}) =>
-          s3Route.s3.putObject({
-            Bucket: bucketName,
-            Key: 'cats/' + fileDir + file,
-            ContentLength: size,
-            Body: fs.createReadStream(fixture)
-          }).promise())
-        .then(() => {
-          return new Server(config, new AddonLoader(__dirname, {}).load())
-            .withProfiles([exampleProfiles])
-            .withRoutes([s3Route])
-            .start()
-            .then(server => {
-              console.log(`server running at ${server.hapi.info.uri}`);
-              return server;
-            });
-        });
+      // manually load module as addon
+      const loader = new AddonLoader(path.join(__dirname, '..', '..'), {'flamingo-s3': '*',});
+      loader.addons = [{
+        pkg: require('../../package.json'),
+        path: path.join(__dirname, '..', '..'),
+        hooks: require('../../index')
+      }];
+      loader.finalize(loader.reduceAddonsToHooks(loader.addons, loader._hooks));
+
+      return new Server(config, loader.load())
+        .withProfiles([exampleProfiles])
+        .withRoutes([new S3Route(config)])
+        .start();
+    }).then(server => {
+      return stat(fixture).then(({size}) => {
+        assert.equal(server.s3Client.config.credentials.accessKeyId, '123');
+        assert.equal(server.s3Client.config.credentials.secretAccessKey, 'abc');
+
+        return server.s3Client.putObject({
+          Bucket: bucketName,
+          Key: 'cats/' + fileDir + file,
+          ContentLength: size,
+          Body: fs.createReadStream(fixture)
+        }).promise();
+      }).then(() => server);
     }).then((server) => {
       return got(`http://localhost:${PORT}/s3/cats/avatar-image/fixtures-fixture.jpg`)
         .then(function (response) {

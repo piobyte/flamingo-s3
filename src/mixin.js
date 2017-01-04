@@ -15,11 +15,6 @@ module.exports = (SuperClass) => {
    * @mixin
    */
   class S3 extends SuperClass {
-    constructor(conf) {
-      super(...arguments);
-      this.s3 = new AWS.S3(conf.AWS.S3.VERSION);
-    }
-
     /**
      * Extracts bucket name and key for a given operation
      * @param {FlamingoOperation} operation
@@ -48,7 +43,7 @@ module.exports = (SuperClass) => {
      * @return {Promise.<function(): Promise.<ReadResult>>}
        */
     extractReader({bucket, key}) {
-      return Promise.resolve(() => s3Reader(bucket.name, `${bucket.path}${key}`, this.s3));
+      return Promise.resolve(() => s3Reader(bucket.name, `${bucket.path}${key}`, this.server.s3Client));
     }
   }
 
