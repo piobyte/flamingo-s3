@@ -31,7 +31,7 @@
   "dependencies": {
     "aws-sdk": "^2.5.0",
     "boom": "^3.2.2",
-    "flamingo": "^2.1.0",
+    "flamingo": "piobyte/flamingo#bfa2c5d194fb873af38b3a013ef408fb8b02aca7",
     "lodash.merge": "^4.6.0"
   },
   "devDependencies": {
