@@ -19,6 +19,7 @@ const AWS = require('aws-sdk');
  * @name ENV
  * @function
  * @example
+ * `AWS_ENDPOINT` => `AWS.ENDPOINT`
  * `AWS_REGION` => `AWS.REGION`
  * `AWS_SECRET` => `AWS.SECRET`
  * `AWS_ACCESS_KEY` => `AWS.ACCESS_KEY`
@@ -26,6 +27,7 @@ const AWS = require('aws-sdk');
  */
 exports[addon.HOOKS.ENV] = function() {
   return [
+    ['AWS_ENDPOINT', 'AWS.ENDPOINT'],
     ['AWS_REGION', 'AWS.REGION'],
     ['AWS_SECRET', 'AWS.SECRET'],
     ['AWS_ACCESS_KEY', 'AWS.ACCESS_KEY'],
@@ -37,11 +39,12 @@ exports[addon.HOOKS.ENV] = function() {
  * Returns default addon configuration
  * @name CONF
  * @function
- * @return {{AWS: {REGION: string, ACCESS_KEY: string, SECRET: string, S3: {VERSION: string, BUCKETS: {alias: {name: string, path: string}}}}}}
+ * @return {{AWS: {ENDPOINT: string, REGION: string, ACCESS_KEY: string, SECRET: string, S3: {VERSION: string, BUCKETS: {alias: {name: string, path: string}}}}}}
  */
 exports[addon.HOOKS.CONF] = function() {
   return {
     AWS: {
+      ENDPOINT: '',
       REGION: 'eu-west-1',
       ACCESS_KEY: '0!]FHTu)sSO&ph8jNJWT',
       SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
@@ -65,13 +68,17 @@ exports[addon.HOOKS.CONF] = function() {
  * @function
  * @param {Server} server server instance
  */
-exports[addon.HOOKS.START] = function(server){
-  AWS.config.update({
-    accessKeyId: server.config.AWS.ACCESS_KEY,
-    secretAccessKey: server.config.AWS.SECRET,
+exports[addon.HOOKS.START] = function(server) {
+  let config = {
+    credentials: new AWS.Credentials(server.config.AWS.ACCESS_KEY, server.config.AWS.SECRET),
     region: server.config.AWS.REGION,
     apiVersion: server.config.AWS.S3.VERSION
-  });
+  };
+  if (server.config.AWS.ENDPOINT !== '') {
+    config['endpoint'] = server.config.AWS.ENDPOINT;
+  }
+  AWS.config.update(config);
+
   if (!server.s3Client) {
     //NOTE: s3Client is a private field and shouldn't be relied on apart from the implemented behavior.
     server.s3Client = new AWS.S3();
