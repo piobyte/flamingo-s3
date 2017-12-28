@@ -69,7 +69,7 @@ exports[addon.HOOKS.CONF] = function() {
  * @param {Server} server server instance
  */
 exports[addon.HOOKS.START] = function(server) {
-  let config = {
+  let config/*: { credentials: any, region: string, apiVersion: string, endpoint?: string } */ = {
     credentials: new AWS.Credentials(server.config.AWS.ACCESS_KEY, server.config.AWS.SECRET),
     region: server.config.AWS.REGION,
     apiVersion: server.config.AWS.S3.VERSION
