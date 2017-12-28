@@ -39,7 +39,7 @@ exports[addon.HOOKS.ENV] = function() {
  * Returns default addon configuration
  * @name CONF
  * @function
- * @return {{AWS: {ENDPOINT: string (optional), REGION: string, ACCESS_KEY: string, SECRET: string, S3: {VERSION: string, BUCKETS: {alias: {name: string, path: string}}}}}}
+ * @return {{AWS: {ENDPOINT: string, REGION: string, ACCESS_KEY: string, SECRET: string, S3: {VERSION: string, BUCKETS: {alias: {name: string, path: string}}}}}}
  */
 exports[addon.HOOKS.CONF] = function() {
   return {
