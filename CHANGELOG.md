@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="2.2.0"></a>
+# [2.2.0](https://github.com/piobyte/flamingo-s3/compare/v2.1.0...v2.2.0) (2018-05-08)
+
+
+### Features
+
+* expose way to force pathStyle ([10e9362](https://github.com/piobyte/flamingo-s3/commit/10e9362)), closes [/docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#s3](https://github.com//docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html/issues/s3)
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/piobyte/flamingo-s3/compare/v2.0.1...v2.1.0) (2017-12-28)
 
