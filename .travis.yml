@@ -4,8 +4,9 @@ cache:
   directories:
   - node_modules
 node_js:
-- '6'
-- 'node'
+- 'lts/boron'
+- 'lts/carbon'
+- '9'
 sudo: 9000
 addons:
   apt:

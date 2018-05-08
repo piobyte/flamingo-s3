@@ -12,6 +12,7 @@
  */
 const addon = require('flamingo/src/addon');
 const AWS = require('aws-sdk');
+const envParser = require('flamingo/src/util/env-parser');
 
 /**
  * Returns s3 environment mappings
@@ -31,7 +32,8 @@ exports[addon.HOOKS.ENV] = function() {
     ['AWS_REGION', 'AWS.REGION'],
     ['AWS_SECRET', 'AWS.SECRET'],
     ['AWS_ACCESS_KEY', 'AWS.ACCESS_KEY'],
-    ['AWS_S3_BUCKETS', 'AWS.S3.BUCKETS', JSON.parse]
+    ['AWS_S3_BUCKETS', 'AWS.S3.BUCKETS', JSON.parse],
+    ['AWS_S3_FORCE_PATH_STYLE', 'AWS.S3.FORCE_PATH_STYLE', envParser.boolean],
   ];
 };
 
@@ -50,6 +52,7 @@ exports[addon.HOOKS.CONF] = function() {
       SECRET: 'XEIHegQ@XbfWAlHI6MOVWKK7S[V#ajqZdx6N!Us%',
       S3: {
         VERSION: '2006-03-01',
+        FORCE_PATH_STYLE: undefined,
         BUCKETS: {
           alias: {
             name: 'bucket-id',
@@ -69,13 +72,16 @@ exports[addon.HOOKS.CONF] = function() {
  * @param {Server} server server instance
  */
 exports[addon.HOOKS.START] = function(server) {
-  let config/*: { credentials: any, region: string, apiVersion: string, endpoint?: string } */ = {
+  let config/*: { credentials: any, region: string, apiVersion: string, endpoint?: string, s3ForcePathStyle?: boolean } */ = {
     credentials: new AWS.Credentials(server.config.AWS.ACCESS_KEY, server.config.AWS.SECRET),
     region: server.config.AWS.REGION,
     apiVersion: server.config.AWS.S3.VERSION
   };
   if (server.config.AWS.ENDPOINT !== '') {
     config['endpoint'] = server.config.AWS.ENDPOINT;
+  }
+  if (server.config.AWS.S3.FORCE_PATH_STYLE) {
+    config['s3ForcePathStyle'] = server.config.AWS.S3.FORCE_PATH_STYLE;
   }
   AWS.config.update(config);
 
