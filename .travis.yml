@@ -6,7 +6,7 @@ cache:
 node_js:
 - 'lts/boron'
 - 'lts/carbon'
-- '9'
+- 'node'
 sudo: 9000
 addons:
   apt:
